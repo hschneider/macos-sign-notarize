@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# sign 1.0.9
+#
+# Signs a macOS App
+#
+# CALL:
+# sign appname
+#
+# (c)2014-2022 Harald Schneider - marketmix.com
+#
+
+# Setup.start
+#
+# The ID of your "Developer ID Application", assigned to your Keyring.
+# This is usually your first- and lastname:
+#
+ID="Your Name"  
+#
+# Setup.end
+
+echo
+echo "Signing ..."
+codesign  --force --deep --timestamp --verbose --options runtime -f --preserve-metadata=identifier,entitlements -s "Developer ID Application: ${ID}" "$1"
+
+echo "-------------------------------------------------"
+echo "Verifying (1) ..."
+codesign  -vvv "$1"
+
+echo "-------------------------------------------------"
+echo "Verifying (2) ..."
+codesign -dv "$1"
+
+echo "-------------------------------------------------"
+echo "Checking Acceptance ..."
+spctl -a -t exec -vv "$1"
+
+echo "-------------------------------------------------"
+echo "DONE !"
+
+
+

@@ -1,0 +1,76 @@
+#!/bin/bash -u
+#
+# notarize 2.0.1
+#
+# Notarize an macOS app bundles, DMGs and PKGs.
+#
+# Changelog:
+# 2.0.1:
+# - Added quoted paths
+# 2.0.0:
+# - Rewritten from scratch and switched to notarytool
+# 1.0.5:
+# - Display logs after processing. Stops when package is invalid.
+# 1.0.2-1.0.4:
+# - Minor changes on the text displayed.
+# 1.0.1:
+# - Added automatic bundle id extraction from app bundles.
+# 1.0.0:
+# - Original script by rednoah
+# - Simplified command line parameters.
+# - Added automatic ZIP file creation.
+# - Fixed UUID extraction.
+# - Stapler won't be called, if the package is invalid.
+#
+# CALL:
+# notarize file (or app bundle)
+#
+# (c)2020-2023 Harald Schneider - marketmix.com
+
+# Setup.start
+#
+USR="name@domain.com"           # Your Apple dev account's email address
+PWD="xxxx-xxxx-xxxx-xxxx"       # Your app specific password, NOT your login password
+TEAM="xxxxxxxx"                 # Your dev team ID
+#
+# Setup.end
+
+doCleanup() {
+    echo "Cleanup ..."
+    rm notarize.log > /dev/null 2>&1
+    rm devlog.json > /dev/null 2>&1
+    rm $FILE.zip > /dev/null 2>&1
+}
+
+FILE="${1%/}"
+
+echo 
+echo "Notarize script started ..."
+
+echo "Packing ..."
+ditto -ck --sequesterRsrc --keepParent "$FILE" "$FILE.zip"
+
+echo "Notarizing ..."
+xcrun notarytool submit "$FILE.zip" --apple-id=$USR --team-id=$TEAM --password=$PWD --wait|tee -a notarize.log
+
+UUID=$(awk '/id:(.*?)/ {print $2;found=1;exit}' notarize.log)
+echo "Extracted UUID is $UUID"
+echo
+
+if grep -q "Invalid" notarize.log; then
+    echo "ERROR: Status invalid"
+    echo "Trying to get the server's log ..."
+    xcrun notarytool log $UUID --apple-id=$USR --team-id=$TEAM --password=$PWD devlog.json
+    echo
+    cat devlog.json
+    echo
+    doCleanup
+    echo "KICKED OUT BY AN ERROR!"
+    exit
+fi
+
+echo "Stapling ..."
+xcrun stapler staple "$FILE"
+
+doCleanup
+echo "DONE!"
