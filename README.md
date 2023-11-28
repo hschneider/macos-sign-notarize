@@ -4,9 +4,9 @@
 
 # macos-sign-notarize
 
-**Handle Apple's Sign- and Notarization-Process from commandline.** 
+**Automate Apple's Sign- and Notarization-Process from commandline.** 
 
-You can sign and notarize macOS Apps, PKGs and DMGs right from your terminal. Just setup the baked-in credentials and you are good to go.
+You can easily sign and notarize macOS Apps, PKGs and DMGs right from your terminal. No more  commaindline parameters to remember. Just setup the baked-in credentials and you are good to go. 
 
 ## sign
 
