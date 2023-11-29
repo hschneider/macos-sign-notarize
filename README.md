@@ -49,3 +49,4 @@ Usage:
 ./notarize application.app
 ```
 
+<img src="https://marketmix.com/git-assets/star-me-2.svg">
