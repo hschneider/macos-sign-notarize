@@ -1,10 +1,12 @@
 #!/bin/bash -u
 #
-# notarize 2.0.1
+# notarize 2.0.2
 #
 # Notarize an macOS app bundles, DMGs and PKGs.
 #
 # Changelog:
+# 2.0.2:
+# - Fixed deleting temp. zip after notarization
 # 2.0.1:
 # - Added quoted paths
 # 2.0.0:
@@ -25,7 +27,7 @@
 # CALL:
 # notarize file (or app bundle)
 #
-# (c)2020-2023 Harald Schneider - marketmix.com
+# (c)2020-2023 Harald Schneider
 
 # Setup.start
 #
@@ -39,7 +41,7 @@ doCleanup() {
     echo "Cleanup ..."
     rm notarize.log > /dev/null 2>&1
     rm devlog.json > /dev/null 2>&1
-    rm $FILE.zip > /dev/null 2>&1
+    rm "$FILE.zip" > /dev/null 2>&1
 }
 
 FILE="${1%/}"
